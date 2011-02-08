@@ -12,7 +12,7 @@ Small window with shortcut buttons for often used commands.
     g = SwingOSC.default
     g.waitForBoot({
         Server.internal.makeGui;
-	Server.local.makeGui;
-	HelperWindow.new.minimize;
+        Server.local.makeGui;
+        HelperWindow.new;
     });
 
