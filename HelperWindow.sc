@@ -16,7 +16,7 @@ HelperWindow : Object {
 		w = 140;
 		h = 20;
 
-		window = Window("HelperWindow", Rect(5,Window.screenBounds.height/2-200, 150, 400));
+		window = Window("HelperWindow", Rect(5,Window.screenBounds.height/2-100, 150, 400));
 		window.front;
 		window.userCanClose_(false);
 		window.alwaysOnTop_(false);
