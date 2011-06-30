@@ -1,0 +1,68 @@
+{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf410
+{\fonttbl\f0\fnil\fcharset77 Monaco;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue191;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural\pardirnatural
+
+\f0\fs40 \cf0 Genetic Algorithms library for SC Server\
+
+\fs24 (c) 2006 Dan Stowell\
+\
+\
+
+\fs30 To install:\
+
+\fs24 \
+Just drop this folder into your SuperCollider extensions \
+directory (see the \ul [Using-Extensions]\ulnone  helpfile for the \
+location on your platform). \
+\
+\
+
+\fs30 To use:\
+
+\fs24 \
+I'm afraid I haven't written any detailed instructions yet.\
+There is some information in comments stored in the top of\
+class files such as\cf2  \cf3 GAIsland\cf2 , \cf3 GAIndividual\cf2 , \cf3 GAGraphCreator2\cf2 ,\cf0 \
+etc.\
+\
+The "GA subclasses" folder contains example applications \
+such as evolving to match a given envelope, evolving to \
+match the pitch track of a given sound sample, etc.\
+\
+Some of the "judge synths" make use of a UGen called \
+"FFTDiffMags" which is available in my UGen pack.\
+\
+See also my talk at the SC symposium 2006, available online\
+at \ul http://www.mcld.co.uk/supercollider\ulnone , which outlines some\
+background and examples.\
+\
+To recap, here's a simple example of creative interactive\
+use of my GA library:\
+\cf2 \
+
+\fs20 s.boot;\
+i = \cf3 GAOwnDrone\cf2 .new(server:s, numinds:24, channels:2).cullProportion_(0.2).makeGui;\
+
+\fs24 \cf0 \
+ \
+
+\fs30 Copyright:\
+
+\fs24 \
+This program is free software; you can redistribute it and/or\
+modify it under the terms of the GNU General Public License\
+as published by the Free Software Foundation; either version 2\
+of the License, or (at your option) any later version.\
+\
+This program is distributed in the hope that it will be useful,\
+but WITHOUT ANY WARRANTY; without even the implied warranty of\
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\
+GNU General Public License for more details.\
+\
+You should have received a copy of the GNU General Public License\
+along with this program; if not, write to the Free Software\
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.\
+\
+\
+}

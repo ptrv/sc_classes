@@ -1,0 +1,264 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;\f2\fnil\fcharset77 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue191;\red191\green0\blue0;\red96\green96\blue96;
+\red0\green115\blue0;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs36 \cf2 RedGAPhenome\cf0 		
+\fs24 phenome for genetic algorithms
+\f1\b0 \
+
+\f0\b\fs36 \
+
+\f1\b0\fs24 superclass: \cf2 Object
+\fs36 \cf0 \
+\
+
+\fs24 class for translating an array of floats (\cf2 RedGAGenome\cf0 ) into a \cf2 SynthDef\cf0 .  the translation can of course be done in numerous ways and this class does it with only binary operators, control and audio unit generators.  there can be no effect ugens.  the good part is that the class is fairy flexible and can deal with genes of any length (>=4).  you can customise which operators and ugens to use and specify ranges for their arguments.  you can also opt for topology of the synthesis network (more nested or more flat).\
+there is no randomness involved in the translation, so each gene should produce the exact same synthdef.  of course noise, chaos and random ugens might make the output sound slightly different but the synthesis network should be the same.
+\fs36 \
+
+\fs24 \
+	
+\f0\b *new(aRedGAGenome, maxDepth)
+\f1\b0 \
+		creates a new phenome from the genome.  translation is done here.\
+		maxDepth defaults to 10 and is the maximum number of levels to nest.\
+	\
+	
+\f0\b *binOps
+\f1\b0 \
+		get or set the array of possible binary operators\
+	\
+	
+\f0\b *arGens
+\f1\b0 \
+		get or set the array of possible audiorate generators (no effects allowed)\
+	\
+	
+\f0\b *krGens
+\f1\b0 \
+		get or set the array of possible controlrate generators (no effects allowed)\
+	\
+	
+\f0\b *specs
+\f1\b0 \
+		get or set the dictionary of argument specs\
+	\
+	
+\f0\b asDefString
+\f1\b0 \
+		get a \cf2 SynthDef\cf0  build from the chromosome string\
+	\
+	
+\f0\b asDefString2
+\f1\b0 \
+		get a \cf2 SynthDef\cf0  build from the chromosome string\
+		also adds a \cf2 Limiter\cf0  and a \cf2 LeakDC\cf0  to balance the output\
+	\
+	
+\f0\b asDefString3
+\f1\b0 \
+		get a \cf2 SynthDef\cf0  build from the chromosome string\
+		also adds a \cf2 Limiter\cf0  and a \cf2 LeakDC\cf0  to balance the output\
+		and an \cf2 EnvGen\cf0  with the envelople you specified (or the default one)\
+	\
+	
+\f0\b asSynthDef
+\f1\b0 \
+		same as asDefString but returns a \cf2 SynthDef\cf0  object.  not just the defining string\
+	\
+	
+\f0\b asSynthDef2
+\f1\b0 \
+		same as asDefString2 but returns a \cf2 SynthDef\cf0  object.  not just the defining string\
+	\
+	
+\f0\b asSynthDef3
+\f1\b0 \
+		same as asDefString3 but returns a \cf2 SynthDef\cf0  object.  not just the defining string\
+	\
+	
+\f0\b chromosome
+\f1\b0 \
+		get the translated genome as a string\
+	\
+	
+\f0\b defName_(aString)
+\f1\b0 \
+		set your own name for the \cf2 SynthDef\cf0 .  if left blank a unique name will be created\
+	\
+	
+\f0\b env_(anEnv)
+\f1\b0 \
+		 set which envelope to use for version 3 above.  defaults to \cf2 Env\cf0 .asr(0.01, 1, 0.02)\
+	\
+	
+\f0\b depth
+\f1\b0 \
+		get the depth used for this chromosome.  ie levels of nesting in the synthesis network.\
+		it is the maxDepth argument above scaled by first gene in the genome.\
+	\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs18 \cf3 //first create a genome\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(10));\
+\
+\cf3 //translate\cf0 \
+b= \cf2 RedGAPhenome\cf0 (a);\
+\
+\cf3 //the bare result (= phenome as string)\cf0 \
+b.chromosome;\
+\
+\cf3 //the phenome wrapped in a simple synthdef\cf0 \
+b.asDefString;\
+\
+\cf3 //the same phenome wrapped in a synthdef with limiter, leakdc and envelope\cf0 \
+b.asDefString3;\
+\
+\cf3 //the same phenome as a synthdef object\cf0 \
+b.asSynthDef;\
+\
+\cf3 //play it (might be loud or very soft)\cf0 \
+s= \cf2 Server\cf0 .internal;\
+s.boot;\
+s.scope;\
+c= b.asSynthDef.play(s);\
+c.free;\
+\
+\cf3 //same thing again.  create a new phenome and play\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(10));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef.play(s);\
+b.asDefString;					\cf3 //post to see what is playing\cf0 \
+c.free;\
+\
+\cf3 //version 2 and 3 usually gives better result as they add limiter and leakdc\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(10));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef2.play(s);\
+b.asDefString2;					\cf3 //post to see what is playing\cf0 \
+c.free;\
+\
+\cf3 //now we use a much longer genome.  the synthdef will be massive but not necessarily good sounding\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(100));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef2.play(s);\
+b.asDefString2;					\cf3 //post to see what is playing\cf0 \
+c.free;\
+\
+\cf3 //or even longer.  but note the upper limit of synthdef size.  may crash sc if too big (\'c5 700)\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(300));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef2.play(s);\
+b.asDefString2;					\cf3 //post to see what is playing - crazy\cf0 \
+c.free;\
+\
+\cf3 //another useful parameter is the depth.  ie how deep to nest ugens.  0= flat and no nesting\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(30));	\cf3 //same genome for both tests below\cf0 \
+\
+b= \cf2 RedGAPhenome\cf0 (a, 0);				\cf3 //no nesting.  ugens are combined with binops\cf0 \
+c= \cf2 RedGAPhenome\cf0 (a, 10);				\cf3 //default max depth.  ugens nest and modulate each other\cf0 \
+\
+d= b.asSynthDef2.play(s);\
+b.asDefString2;					\cf3 //post to see flat variant\cf0 \
+d.free;\
+\
+e= c.asSynthDef2.play(s);\
+c.asDefString2;					\cf3 //post to see nested variant\cf0 \
+e.free;\
+\
+\cf3 //but the depth argument is really just a possible maxDepth as it is scaled by the first genome.\cf0 \
+\cf3 //so a 0 at first position will give a flat network despite your depth argument.\cf0 \
+\cf3 //note: this is the only gene that is a bit special.  it sets the topology gene.\cf0 \
+a.chromosome;\
+\
+\
+\cf3 //as there is no randomness involved, it is possible to predict the synthdefs.\cf0 \
+\cf3 //the following will produce a def for a synth with 3 amplitude modulated sines\cf0 \
+a= \cf2 RedGAGenome\cf0 (#[1, 0, 0, 1, 0.16, 0, 0.671, 0, 1, 0.2, 0, 0.671, 0, 1, 0.41]);\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef.play(s);\
+b.asDefString;\
+c.free;\
+\
+\cf3 //or 3 frequence modulated sines\cf0 \
+a= \cf2 RedGAGenome\cf0 (#[1, 0, 0.2, 0.8, 0.671, 0.05, 0.08, 0.331, 0.011, 0.013, 0.7]);\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef.play(s);\
+b.asDefString;\
+c.free;\
+\
+\cf3 //unfortunately is it too complicated to translate synthdefs back to genes for now\cf0 \
+\
+\
+\cf3 //an envelope can be added to the synthdef\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(30));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+b.env_(\cf2 Env\cf0 .perc);					\cf3 //set envelope\cf0 \
+c= b.asSynthDef3.play(s);			\cf3 //and use version 3\cf0 \
+b.asDefString3;\
+\
+b.env_(\cf2 Env\cf0 .linen(3, 1, 1));\
+c= b.asSynthDef3.play(s);			\cf3 //and use version 3.  note all use doneAction 2\cf0 \
+b.asDefString3;\
+\
+\cf3 //you can also specify which name to give the synthdef\cf0 \
+b.defname_(\cf4 "harald"\cf0 );\
+b.asDefString3;\
+\
+\
+\cf3 //often you get better sounding (here less noisy) synthdefs if you constrain the set of ugens\cf0 \
+\cf2 RedGAPhenome\cf0 .binOps;				\cf3 //list all available binary operators (also see source code)\cf0 \
+\cf2 RedGAPhenome\cf0 .arGens;				\cf3 //list all available ar ugens\cf0 \
+\cf2 RedGAPhenome\cf0 .krGens;				\cf3 //list all available kr ugens\cf0 \
+\
+\cf3 //to specify your own list of binary operators just do this\cf0 \
+\cf2 RedGAPhenome\cf0 .binOps_([\cf5 '+'\cf0 , \cf5 '*'\cf0 ]);	\cf3 //constrain to only 2 binOps\cf0 \
+\
+\cf3 //arGens must be specified as follows...\cf0 \
+(\
+\cf2 RedGAPhenome\cf0 .arGens_([				\cf3 //constrain and only use a few\cf0 \
+	[\cf2 Formant\cf0 , [\cf5 \\freq\cf0 , \cf5 \\freq\cf0 , \cf5 \\freq\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]],\
+	[\cf2 LFSaw\cf0 , [\cf5 \\freq\cf0 , \cf5 \\iphase2\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]],\
+	[\cf2 SinOsc\cf0 , [\cf5 \\freq\cf0 , \cf5 \\phase\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]],\
+	[\cf2 LFPulse\cf0 , [\cf5 \\freq\cf0 , \cf5 \\width\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]]\
+]);\
+)\
+\
+\cf3 //and the same for krGens\cf0 \
+(\
+\cf2 RedGAPhenome\cf0 .krGens_([				\cf3 //constrain and only a few\cf0 \
+	[\cf2 LFNoise0\cf0 , [\cf5 \\lofreq\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]],\
+	[\cf2 SinOsc\cf0 , [\cf5 \\lofreq\cf0 , \cf5 \\phase\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]],\
+	[\cf2 LFPulse\cf0 , [\cf5 \\lofreq\cf0 , \cf5 \\width\cf0 , \cf5 \\mul\cf0 , \cf5 \\add\cf0 ]]\
+]);\
+)\
+\
+\cf3 //all the symbols above are looked up in the specs dictionary.  you should provide your own specs\cf0 \
+specs= (\
+	\cf5 \\freq\cf0 : #[\cf5 \\exprange\cf0 , 20, 20000],\
+	\cf5 \\lofreq\cf0 : #[\cf5 \\exprange\cf0 , 0.1, 20],\
+	\cf5 \\phase\cf0 : #[\cf5 \\range\cf0 , 0, 2pi],\
+	\cf5 \\phase1\cf0 : #[\cf5 \\range\cf0 , 0, 1],\
+	\cf5 \\width\cf0 : #[\cf5 \\range\cf0 , 0, 1],\
+	etc...\
+\
+\cf2 RedGAPhenome\cf0 .specs;				\cf3 //get all specs\cf0 \
+\
+\cf3 //so this dictionary is for looking up arguments specs by name.  a spec defines mapping range.\cf0 \
+\cf3 //first in a spec array is mapping curve (\\exprange or \\range) and the next two are min and max.\cf0 \
+\cf3 //to change or add specs you can do like this...\cf0 \
+\cf2 RedGAPhenome\cf0 .specs.put(\cf5 \\freq\cf0 , #[\cf5 \\exprange\cf0 , 100, 10000]);\
+\
+\cf3 //now try out translating with our new limited set of ugens\cf0 \
+a= \cf2 RedGAGenome\cf0 (\{1.0.rand\}.dup(10));\
+b= \cf2 RedGAPhenome\cf0 (a);\
+c= b.asSynthDef2.play(s);\
+b.asDefString2;					\cf3 //post to see what is playing\cf0 \
+c.free;\
+\
+\
+}

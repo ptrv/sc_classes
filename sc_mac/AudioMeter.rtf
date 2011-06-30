@@ -1,0 +1,367 @@
+{\rtf1\mac\ansicpg10000\cocoartf824\cocoasubrtf330
+{\fonttbl\f0\fnil\fcharset77 Monaco;\f1\fswiss\fcharset77 Helvetica-Bold;\f2\fswiss\fcharset77 Helvetica;
+\f3\fswiss\fcharset77 Helvetica-Oblique;}
+{\colortbl;\red255\green255\blue255;\red191\green0\blue0;\red0\green115\blue0;\red0\green0\blue191;
+\red96\green96\blue96;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs18 \cf2 // Andre Bartetzki, April 2005
+\f1\b\fs36 \cf0 \
+\
+AudioMeter
+\f0\b0\fs18 			
+\f1\b\fs24 signal metering window
+\f2\b0 \
+\
+\
+AudioMeter provides a window with bargraph displays to monitor audio signal on busses.\
+It uses only OSX standard distribution SC classes, no other libraries or objects.\
+\
+For level measuring AudioMeter creates a synth node with PeakFollowers and periodically called SendTrigs.\
+Corresponding OSCResponders are added which update the bargraph displays (
+\f1\b SCRangeSlider
+\f2\b0 ), \
+the clipping indicators (
+\f1\b SCButton
+\f2\b0 ) and the peak levels (
+\f1\b SCNumberBox
+\f2\b0 ).\
+\
+Two classvars, 
+\f1\b idCount
+\f2\b0  and 
+\f1\b id
+\f2\b0 , are used for the indication of trigger messages and for window position calculation.\
+To prevent interferences with the trigger messages of AudioMeter you should not use 
+\f1\b SendTrig
+\f2\b0  ids of 4242 and higher.\
+\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f3\i \cf0 Features and GUI elements in the window of AudioMeter:\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\i0 \cf0 \
+The numbers in the first row indicate the bus / channel numbers.\
+The bargraphs get updated depending on the instance variable 
+\f1\b rate
+\f2\b0  (default 30 Hz).\
+The recovering (fall back) velocity is given by the instance variable 
+\f1\b decay
+\f2\b0  (default 30 dB/second). \
+The range of the displays is -60.0 to 0.0 dB, which can be reconfigured by setting the instance variables 
+\f1\b dbmin
+\f2\b0  and 
+\f1\b dbmax
+\f2\b0 .\
+The grey clipping indicators turn into red on levels over 0 dB (amplitude 1.0).\
+The number displays show the maximum level in dB.\
+A click on a clipping indicator resets it as well as the corresponding number box below.\
+There is an 
+\f1\b autoreset
+\f2\b0  feature for a periodically reset, autoreset is off by default.\
+An AudioMeter frees itself on closing its window, there is also a 
+\f1\b quit
+\f2\b0  method.\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b\fs32 \cf0 Instance creation:
+\f2\b0\fs24 \
+\
+\
+	
+\f1\b *new(index, target, addAction, point, label)
+\f2\b0 \
+		returns a new instance of AudioMeter, starts the metering synth \
+		and builds the SCWindow containing one or more meters.\
+		The server of the target must be booted before the creation of an AudioMeter.\
+		\
+		
+\f1\b index
+\f2\b0  - an integer or an array of integers indicating the bus numbers to watch.\
+			Default: [0,1]\
+			The bus numbers in the array must not necessarily be in a consecutive order, \
+			e.g. [0,1,2,3] watches outputs 1 to 4, [2,0] watches only outputs 3 and 1\
+						\
+		
+\f1\b target
+\f2\b0  - a node or a server where the measuring synth gets placed (depending on the 
+\f1\b addAction
+\f2\b0 ).\
+			Default: Server.default \
+		\
+		
+\f1\b addAction
+\f2\b0  - where to add the synth in relation to the target.\
+			Default:  \cf3 \\addAfter\cf0 \
+			To watch all audio signals written to a bus, use \cf3 \\addAfter\cf0  and the server as target.\
+			To watch the outcome of a group, use \cf3 \\addToTai\cf0 l and the group as target\
+			To watch the inputs of an audio device, use \cf3 \\addBefore\cf0  and the server as target.\
+			There are convenience methods for creating input and output meters, see below.\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs18 \cf0 \
+
+\f2\fs24 		
+\f1\b point
+\f2\b0  - the lower left corner coordinates of the window as point (distance from left, distance from bottom).\
+			The default position is on the bottom of the screen next to the server window. \
+			The default width is adapted to the number of bargraphs.\
+			Additional AudioMeters will be placed by default on the right side of the existing ones.\
+			\
+		
+\f1\b label
+\f2\b0  - the subtitle of the window	\
+		\
+
+\f0\fs18 \
+
+\f2\fs24 	
+\f1\b *output(index, server, rect, label)
+\f2\b0 \
+		returns a new instance of AudioMeter, places the metering synth after the 
+\f1\b default group
+\f2\b0 \
+		and builds the SCWindow containing one or more meters.\
+		The server must be booted before the creation of an AudioMeter.\
+		\
+		
+\f1\b index
+\f2\b0  - an integer, the symbol \cf3 \\all\cf0  or an array of integers indicating the outputs to watch.\
+			Default: [0,1] (that is stereo out)\
+			The output numbers in the array must not necessarily be in a consecutive order, \
+			e.g. [0,1,2,3] watches outputs 1 to 4, [2,0] watches only outputs 3 and 1.\
+			\cf3 \\all\cf0  watches all out channels according to the servers options.numOutputBusChannels.\
+			If the given indices are higher than the number of output busses on the server\
+			you are watching input channels, because their bus numbers are immediately above the last output channel!\
+						\
+		
+\f1\b server
+\f2\b0  - the server.  \
+			Default: Server.default\
+			The addAction is always \cf3 \\addAfter\cf0  so that you watch the outputs after the 
+\f1\b default group 
+\f2\b0 (like scope).\
+
+\f0\fs18 \
+\
+
+\f2\fs24 	
+\f1\b *input(index, server, rect, label)
+\f2\b0 \
+		returns a new instance of AudioMeter, places the metering synth before the 
+\f1\b default group
+\f2\b0 \
+		and builds the SCWindow containing one or more meters.\
+		The server must be booted before the creation of an AudioMeter.\
+		\
+		
+\f1\b index
+\f2\b0  - an integer, the symbol \cf3 \\all\cf0  or an array of integers indicating the inputs to watch.\
+			Here input bus numbers are counted from 0 (in contrast to 
+\f1\b AudioIn
+\f2\b0 , which begins at 1) !\
+			AudioMeter translates these indices according to  the servers numInputBusChannels \
+			and displays the real bus numbers (most likely starting at 8).\
+			Default: [0,1] (that is stereo in)\
+			The input numbers in the array must not necessarily be in a consecutive order, \
+			e.g. [0,1,2,3] watches input 1 to 4, [2,0] watches only input 3 and 1.\
+			\cf3 \\all\cf0  watches all input channels according to the servers options.numInputBusChannels.\
+			If the given indices are higher than the number of input busses on the server, \
+			you are probably watching channels generated by 
+\f1\b Bus.audio
+\f2\b0 , because the index \
+			of the first additional audio bus is numOutputBusChannels + numInputBusChannels.\
+						\
+		
+\f1\b server
+\f2\b0  - the server.  \
+			Default: Server.default\
+			The addAction is always \cf3 \\addBefore \cf0 so that you watch the inputs before the 
+\f1\b default group
+\f2\b0 .\
+
+\f0\fs18 \
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f2\fs24 \cf0 \ul \ulc0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f1\b\fs32 \cf0 \ulnone Instance methods:
+\f2\b0\fs24 \
+\
+\
+	
+\f1\b quit
+\f2\b0 \
+		free the synth, remove the OSCResponders and close the window.\
+		Same as a click on the window close button.	\
+		\
+	
+\f1\b alwaysOnTop_(boolean)
+\f2\b0 \
+		true or false\
+		The window of an AudioMeter is always on top of other windows ("floating") by default.\
+		With this method one can set alwaysOnTop to false after creation. \
+		Default: true\
+		\
+	
+\f1\b decay_(value)
+\f2\b0 \
+		set the decay rate in dB per second for the recovery of the bargraph. \
+		For example, if decay is 60 dB/sec and the display shows the level \
+		between 0 dB (
+\f1\b dbmax
+\f2\b0 ) and -60 dB (
+\f1\b dbmin
+\f2\b0 ) it takes 1 second to fully recover from a 0 dB impulse.\
+		The useful range is 120.0 (very fast)  to 20.0 (quite slow).\
+		Default: 60.0\
+	\
+	
+\f1\b rate_(value)
+\f2\b0 \
+		the rate indicates how many times in a second the bargraph display gets updated, \
+		i.e. it controls the smoothness as well the accuracy of the display.  \
+		The useful range is 10 to 40. High values are more CPU intensive but more accurate on fast changing signals.\
+		If you expect very short and loud impulses you should use a high rate to identify clippings.\
+		Default: 30\
+	\
+	
+\f1\b autoreset_(value)
+\f2\b0 \
+		controls the automatic reset of the clipping indicator and the peak level number.\
+		If value = 0.0, the display shows always the highest level so far, if not reset manually.		If value > 0.0, the display gets reset auomatically every value seconds. \
+		The minimum value is limited to 0.1 (resetting 10 times a second) to prevent too much CPU load.\
+		Default: 0.0 (off)\
+	\
+	
+\f1\b dbmin_(value)
+\f2\b0 \
+		set the minimum value in dB of the bargraph display.\
+		Does not affect the peak number display, which shows always the unlimited peak level.\
+		Default: -60.0 	\
+\
+	
+\f1\b dbmax_(value)
+\f2\b0 \
+		set the maximum value in dB of the bargraph display.\
+		Does not affect the peak number display, which shows always the unlimited peak level.\
+		To watch levels on the output or between nodes on the server it maybe useful \
+		to set this value higher than 0 dB to be able estimate the risk and the amount of level overloading.\
+		Default: 0.0 	\
+		\
+		\
+		\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\fs18 \cf0 \
+
+\fs32 \cf2 // examples:
+\fs18 \cf0 \
+\
+s = Server.default;\
+s.boot;\
+\
+\
+\cf2 // monitor the stereo inputs:\cf0 \
+i = \cf4 AudioMeter\cf0 .input;\
+\
+\cf2 // set autoreset to 1 second:\cf0 \
+i.autoreset = 1.0;\
+\
+\cf2 // switch off autoreset:\cf0 \
+i.autoreset = 0;\
+\
+\cf2 // slow down the recovery rate:\cf0 \
+i.decay = 20.0;\
+\
+\cf2 // back to a normal value:\cf0 \
+i.decay = 60.0;\
+\
+\cf2 // change the rate:\cf0 \
+i.rate = 8;\
+\
+\cf2 // remove the AudioMeter:\cf0 \
+i.quit;\
+\
+\
+\
+\cf2 // monitor the first 4 outputs on the internal Server:\cf0 \
+\
+s = \cf4 Server\cf0 .internal;\
+s.boot;\
+\
+o = \cf4 AudioMeter\cf0 .output( (0..3), s);\
+\
+\cf2 // make some sound and watch the clipping LEDs:\cf0 \
+y = \cf4 SynthDef\cf0 (\cf5 "test"\cf0 , \{\cf4 arg\cf0  amp=1.1; \cf4 Out\cf0 .ar(0, \cf4 PanAz\cf0 .ar(4, \cf4 SinOsc\cf0 .ar(300, 0, amp), \cf4 LFSaw\cf0 .kr(0.4))) \}).play(s);\
+\
+\cf2 // switch autoreset on:\cf0 \
+o.autoreset = 0.5;\
+\
+\cf2 // lower the amplitude to -6 dB:\cf0 \
+y.set(\cf3 \\amp\cf0 , 0.5);\
+\
+\cf2 // set the lower display bound to -12 dB:\cf0 \
+o.dbmin = -12;\
+\
+\cf2 // set the higher display bound to -6 dB:\cf0 \
+o.dbmax = -6;\
+\
+\cf2 // back to normal values:\cf0 \
+o.dbmin_(-60).dbmax_(0.0);\
+\
+\
+\cf2 // generate clipping impulses on a node before y\cf0 \
+x = \cf4 SynthDef\cf0 (\cf5 "test2"\cf0 , \{ \cf4 Out\cf0 .ar(0, \cf4 Impulse\cf0 .ar([1,1], 0, 1.1)) \}).play(y, addAction: \cf3 \\addBefore\cf0 )\
+\
+s.queryAllNodes; \
+\
+\cf2 // add a 4 channel meter between x and y:\cf0 \
+p = \cf4 AudioMeter\cf0 ([0,1,2,3], x, \cf3 \\addAfter\cf0 );\
+\
+s.queryAllNodes; \
+\
+\cf2 // -> the new meter displays only the output of x !\
+// -> the first meter displays the mix of y and x\cf0 \
+\
+\
+x.free;\
+p.quit;\
+\
+\
+y.free;\
+o.quit;\
+\
+\
+\cf2 // display all in and out channels on 8 channel hardware:\cf0 \
+z = \cf4 AudioMeter\cf0 .output( (0..15), s);\
+\
+z.quit;\
+\
+\
+\cf2 // display stereo in and out:\cf0 \
+\cf2 // note that this works correct only if no synth writes to the input channels !\cf0 \
+z = \cf4 AudioMeter\cf0 .output([0,1] + s.options.numOutputBusChannels ++ [0,1], s);\
+\
+z.quit;\
+\
+\
+\cf2 // .new displays stereo out by default, listening after the default group:\cf0 \
+a = \cf4 AudioMeter\cf0 .new;\
+\cf2 // this is the same as:\cf0 \
+a = \cf4 AudioMeter\cf0 .output;\
+\
+a.quit; b.quit;\
+\
+\
+\
+}

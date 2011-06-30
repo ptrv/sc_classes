@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<title></title>
+<meta name="Generator" content="Cocoa HTML Writer">
+<meta name="CocoaVersion" content="824.41">
+<style type="text/css">
+p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 18.0px Helvetica; min-height: 22.0px}
+p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; min-height: 12.0px}
+p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #606060}
+p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco}
+p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 9.0px Monaco; color: #bf0000}
+span.s1 {font: 18.0px Helvetica; color: #0000bf}
+span.s2 {color: #0000bf}
+span.s3 {color: #007300}
+span.s4 {color: #000000}
+span.s5 {color: #606060}
+span.Apple-tab-span {white-space:pre}
+</style>
+</head><body>
+<p class="p1"><span class="s1"><b>RedFolderGUI</b></span><b><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>patch launcher utility</b></p>
+<p class="p2"><br></p>
+<p class="p1">superclass: <span class="s2">Object</span></p>
+<p class="p2"><b></b><br></p>
+<p class="p1">document browser and launcher.<span class="Apple-converted-space">&nbsp; </span>select and press return or enter to open a document.</p>
+<p class="p1">shortcut <span class="s3">'ctrl+u'</span> scans the directory again and updates the list of documents.</p>
+<p class="p1">button <span class="s3">'loadThis'</span> will run the code in the selected document.</p>
+<p class="p1">button <span class="s3">'loadAll'</span> will run the code in all the available documents.<span class="Apple-converted-space">&nbsp; </span>may be used to load many synthdefs at once.</p>
+<p class="p1">button <span class="s3">'reveal'</span> will try to show the document in mac osx finder (using unixcmd plus an osascript).</p>
+<p class="p3"><b></b><br></p>
+<p class="p1"><b><span class="Apple-tab-span">	</span>*new(path, recursive, bounds)</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>creates a new <span class="s2">RedFolderGUI</span> window.</p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>path should point to a folder with sc documents.</p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>recursive is a flag.<span class="Apple-converted-space">&nbsp; </span>if <span class="s2">true</span> it will search recursively in all available folders (default= <span class="s2">false</span>).</p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>bounds should be a <span class="s2">Rect</span> defining window position and size.</p>
+<p class="p3"><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p1"><b><span class="Apple-tab-span">	</span>update</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>rescans the directory</p>
+<p class="p3"><b><span class="Apple-tab-span">	</span></b></p>
+<p class="p1"><b><span class="Apple-tab-span">	</span>font_(font)</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>set window font</p>
+<p class="p3"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><b><span class="Apple-tab-span">	</span>front</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>bring window to front</p>
+<p class="p3"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>window</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>get parent window</p>
+<p class="p3"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>path</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>get current path</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>recursive</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>get or set flag</p>
+<p class="p3"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>allPaths</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>report paths to all documents</p>
+<p class="p3"><span class="Apple-tab-span">	</span></p>
+<p class="p1"><span class="Apple-tab-span">	</span><b>listView</b></p>
+<p class="p1"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>access the embedded <span class="s2">SCListView</span></p>
+<p class="p4"><br></p>
+<p class="p4"><br></p>
+<p class="p5"><span class="s4">a= </span><span class="s2">RedFolderGUI</span><span class="s4">(</span>"examples", true<span class="s4">);</span></p>
+<p class="p4"><br></p>
+<p class="p6">a.front</p>
+<p class="p6">a.font_(<span class="s2">Font</span>(<span class="s5">"Geneva"</span>, 9))</p>
+<p class="p7"><span class="s4">a.font_(</span><span class="s2">Font</span><span class="s4">(</span><span class="s5">"Monaco"</span><span class="s4">, 9))<span class="Apple-tab-span">	</span></span>//back to default</p>
+<p class="p4"><br></p>
+<p class="p6">a.window</p>
+<p class="p6">a.path</p>
+<p class="p6">a.recursive</p>
+<p class="p6">a.allPaths</p>
+<p class="p6">a.listView</p>
+<p class="p6">a.listView.items</p>
+<p class="p4"><br></p>
+</body></html>

@@ -1,0 +1,63 @@
+{\rtf1\mac\ansicpg10000\cocoartf102
+{\fonttbl\f0\fswiss\fcharset77 Helvetica-Bold;\f1\fswiss\fcharset77 Helvetica;\f2\fnil\fcharset77 Monaco;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue191;\red0\green0\blue0;\red191\green0\blue0;
+\red0\green115\blue0;\red96\green96\blue96;}
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b\fs36 \cf2 Pca1\cf3 	
+\fs24 			\cf0 1D cellular automat\cf3 a
+\f1\b0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\fs36 \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\fs24 \cf0 superclass: ListPattern
+\fs36 \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+
+\f0\b \cf3 \
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\f1\b0\fs24 \cf3 a simple pattern class that works recursively on a list of cells.  the cells can be either on or off (1 or 0).  for each repeat, a new list is generated from the previous one using the specified rule.  a repeat is a generation.\
+\pard\tx565\tx1133\tx1700\tx2266\tx2832\tx3401\tx3967\tx4535\tx5102\tx5669\tx6235\tx6802\ql\qnatural
+
+\f0\b \cf3 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf3 	*new(list, rule, generation, repeats, offset)
+\f1\b0 \
+		list should be an initial array of cells set to on or off (1 or 0).\
+		rule can be 0-255.  some rules (30, 90, 110, 250, 254) works better than others.\
+		generation is which repeat to start at (default= 0).\
+		repeats is total number of generations (default\cf0 = inf).\cf3 \
+		offset lets you start at some index within the list of cells (default= 0).
+\f0\b \
+	
+\f2\b0\fs18 \
+\
+s.boot;\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\ql\qnatural
+\cf4 //stabilises after a a few generations\cf3 \
+a= \cf2 Pca1\cf3 ([0, 0, 0, 1, 0, 0, 1, 1], 30, 0, 20);\
+b= \cf2 Pbind\cf3 (\cf5 \\dur\cf3 , 0.25, \cf5 \\degree\cf3 , \cf2 Pseq\cf3 ([0, 0, 0, 1], \cf2 inf\cf3 ), \cf5 \\amp\cf3 , a).play;\
+b.stop;\
+\
+\cf4 //same example but with a different rule\cf3 \
+a= \cf2 Pca1\cf3 ([0, 0, 0, 1, 0, 0, 1, 1], 90, 0, 20);\
+b= \cf2 Pbind\cf3 (\cf5 \\dur\cf3 , 0.25, \cf5 \\degree\cf3 , \cf2 Pseq\cf3 ([0, 0, 0, 1], \cf2 inf\cf3 ), \cf5 \\amp\cf3 , a).play;\
+b.stop;\
+\
+\cf4 //simple post example\cf3 \
+(\
+	\cf2 var\cf3  list, ca, cell, str= \cf6 ""\cf3 , i= 0;\
+	list= \cf2 Array\cf3 .fill(64, 0).put(32, 1);			\cf4 //set initial pattern\cf3 \
+	ca= \cf2 Pca1\cf3 (list, 90, 0, 32).asStream;			\cf4 //rule90 with 32 repetitions\cf3 \
+	while(\{(cell= ca.next).notNil\}, \{\
+		str= str++\cf6 " *"\cf3 [cell];\
+		if(i%list.size==(list.size-1), \{str.postln; str= \cf6 ""\cf3 \});\
+		i= i+1;\
+	\});\
+)\
+}
