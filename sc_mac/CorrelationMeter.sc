@@ -31,7 +31,7 @@
 CorrelationMeter {
 	var window, cmView, bus1View, bus2View;
 	var memoButton;
-	var freeze;
+	var freeze = false;
 	var <server, <bus1, <bus2, <target;
 	var correlationValue;
 	var bufferLength = 0.5, <rate=0.5;
@@ -43,7 +43,8 @@ CorrelationMeter {
 	}
 	
 	init { arg argtarget,argbus;
-		
+
+		correlationValue = 1;
 		target = argtarget ? RootNode(Server.default);
 		server = target.server;
 		bus1 = argbus ? 0;
@@ -82,15 +83,30 @@ CorrelationMeter {
 			});
 		
 		
-		memoButton = ToggleButton(window, "Memo", {
-			freeze = true;
-		}, {
-			freeze = false;
-		}, false, 50, 30);
-		
+		// memoButton = ToggleButton(window, "Memo", {
+		// 	freeze = true;
+		// }, {
+		// 	freeze = false;
+		// }, false, 50, 30);
+
+		memoButton = Button(window, Rect(0,0,70, 30))
+		.states_([
+			["Memo off", Color.black, Color.grey],
+			["Memo on", Color.black, Color.red]
+		])
+		.action_({ |button|
+			if(freeze == true, {
+				"freeze false".postln;
+				freeze = false;
+			},{
+				"freeze true".postln;
+				freeze = true;
+			})
+		});
 		decorator.nextLine;
 		cmView = UserView(window,Rect(0,0, window.view.bounds.width-10,window.view.bounds.height-50))
 		.drawFunc_({ |me|
+			var actualVal;
 			var center = me.bounds.width / 2;
 			var viewHeight = me.bounds.height / 2;
 			Pen.fillColor = Color.black;
@@ -145,6 +161,28 @@ CorrelationMeter {
 				Pen.fillRect(Rect((center-10)-(20*(i+1)), viewHeight-10, 19,20 ));
 			};
 
+			actualVal = correlationValue.linlin(-1, 1, center-5 - 200, center+5 + 200);
+
+			Pen.stroke;
+
+			actualVal.postln;
+			if(correlationValue.inRange(-1, -0.02), {
+				"red".postln;
+				Pen.fillColor = Color.red;
+			});
+			if(correlationValue.inRange(-0.02, 0.02), {
+				"yellow".postln;
+				Pen.fillColor = Color.yellow;
+			});
+			if(correlationValue.inRange(0.02, 1), {
+				"green".postln;
+				Pen.fillColor = Color.green;
+			});
+
+			Pen.fillRect(Rect(actualVal, viewHeight-10, 10, 20));
+
+			
+
 		});
 		
 		window.front;
@@ -161,5 +199,16 @@ CorrelationMeter {
 	}
 
 	stopCorrelationMeter{
+	}
+
+	correlationValue_{ |val|
+		correlationValue = val;
+		if(freeze == false, {
+			cmView.refresh;
+		});
+		// {cmView.refresh}.defer;
+	}
+	correlationValue {
+		^correlationValue;
 	}
 }
