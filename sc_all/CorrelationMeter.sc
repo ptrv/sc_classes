@@ -33,7 +33,7 @@ CorrelationMeter {
 	var memoButton;
 	var freeze = false;
 	var <server, <bus1, <bus2, <target;
-	var correlationValue;
+	var <>correlationValue;
 	var bufferLength = 0.5, <rate=0.5;
 	var buffer1, buffer2, task;
 	var synth1, synth2;
@@ -55,20 +55,27 @@ CorrelationMeter {
 
 		task = Task({
 			loop {
-				
+				if(freeze == false, {
+					{cmView.refresh}.defer;
+				});
 				rate.wait;
 			};
 		});
 		this.makeGUI;
+		{this.runCorrelationMeter}.defer(0.5);
+
+		ServerTree.add(this, server); // <---------------
 	}
 
 	makeGUI {
 		var decorator;
 
-		window = Window("Correlation Meter", Rect(128, 64, 640, 200));
+		// window = Window("Correlation Meter", Rect(128, 64, 640, 200));
+		window = Window("Correlation Meter", Rect(10, 64, 640, 200));
 		window.view.decorator = FlowLayout(window.view.bounds, 5@5, 5@5 );
 		decorator = window.view.decorator;
- 		bus1View = NumberBox(window, 50 @ 30) 
+
+		bus1View = NumberBox(window, 50 @ 30) 
 			.clipLo_(0)
 			.clipHi_(server.options.numControlBusChannels - 1)
 			.value_(bus1)
@@ -82,13 +89,6 @@ CorrelationMeter {
 			.action_({ // arg view; this.bus_(view.value)
 			});
 		
-		
-		// memoButton = ToggleButton(window, "Memo", {
-		// 	freeze = true;
-		// }, {
-		// 	freeze = false;
-		// }, false, 50, 30);
-
 		memoButton = Button(window, Rect(0,0,70, 30))
 		.states_([
 			["Memo off", Color.black, Color.grey],
@@ -96,14 +96,14 @@ CorrelationMeter {
 		])
 		.action_({ |button|
 			if(freeze == true, {
-				"freeze false".postln;
 				freeze = false;
 			},{
-				"freeze true".postln;
 				freeze = true;
 			})
 		});
+
 		decorator.nextLine;
+
 		cmView = UserView(window,Rect(0,0, window.view.bounds.width-10,window.view.bounds.height-50))
 		.drawFunc_({ |me|
 			var actualVal;
@@ -161,30 +161,19 @@ CorrelationMeter {
 				Pen.fillRect(Rect((center-10)-(20*(i+1)), viewHeight-10, 19,20 ));
 			};
 
-			actualVal = correlationValue.linlin(-1, 1, center-5 - 200, center+5 + 200);
+			actualVal = correlationValue.linlin(-1, 1, center-5 - 200, center-5 + 200);
 
 			Pen.stroke;
-
-			actualVal.postln;
-			if(correlationValue.inRange(-1, -0.02), {
-				"red".postln;
-				Pen.fillColor = Color.red;
-			});
-			if(correlationValue.inRange(-0.02, 0.02), {
-				"yellow".postln;
-				Pen.fillColor = Color.yellow;
-			});
-			if(correlationValue.inRange(0.02, 1), {
-				"green".postln;
-				Pen.fillColor = Color.green;
-			});
-
-			Pen.fillRect(Rect(actualVal, viewHeight-10, 10, 20));
-
+			Pen.fillColor_(
+				case
+				{(correlationValue >= -1) && (correlationValue < -0.02)}	{Color.red}
+				{(correlationValue >= -0.02) && (correlationValue <= 0.02)}	{Color.yellow}
+				{(correlationValue > 0.02) && (correlationValue <= 1)}	{Color.green};
+			);
 			
-
+			Pen.fillRect(Rect(actualVal, viewHeight-10, 10, 20));
 		});
-		
+
 		window.front;
 
 		window.onClose_({
@@ -196,19 +185,10 @@ CorrelationMeter {
 	doOnServerTree { this.runCorrelationMeter }
 	
 	runCorrelationMeter {
+		task.play;
 	}
 
 	stopCorrelationMeter{
-	}
-
-	correlationValue_{ |val|
-		correlationValue = val;
-		if(freeze == false, {
-			cmView.refresh;
-		});
-		// {cmView.refresh}.defer;
-	}
-	correlationValue {
-		^correlationValue;
+		task.stop;
 	}
 }
