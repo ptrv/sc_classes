@@ -1,5 +1,5 @@
 + Main {
-	run {
-		Help.gui;
-	}
+    run {
+        HelperWindow.new;
+    }
 }
