@@ -1,4 +1,4 @@
-Utils : Object {
+EmacsUtils : Object {
 
     *initClass {
         StartUp.add {
