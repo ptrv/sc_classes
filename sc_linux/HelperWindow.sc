@@ -7,7 +7,7 @@
 
 */
 HelperWindow : Object {
-    var window, w, h;
+    var <window, w, h;
     *new {
         ^super.new.init;
     }
