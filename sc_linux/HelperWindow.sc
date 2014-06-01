@@ -53,10 +53,20 @@ HelperWindow : Object {
         .action_({ SynthDescLib.read.global.browse });
         Button(window, Rect(0,0, w, h))
         .states_([["Open scwork"]])
-        .action_({ unixCmd("nautilus ~/scwork") });
+        .action_({ unixCmd("xdg-open ~/scwork") });
         Button(window, Rect(0,0, w, h))
         .states_([["Open SuperCollider"]])
-        .action_({ unixCmd("nautilus ~/.local/share/SuperCollider") });
+        .action_({ unixCmd("xdg-open ~/.local/share/SuperCollider") });
+        Button(window, Rect(0,0, w, h))
+        .states_([["Render Help files"]])
+        .action_({
+            //SCDoc.helpSourceDir = "/usr/local/share/SuperCollider/HelpSource";
+            // var oldHelpTarget = SCDoc.helpTargetDir;
+            // SCDoc.helpTargetDir = "~/.local/share/SuperCollider/RenderedHelp".standardizePath;
+            SCDoc.renderAll;
+            //SCDoc.helpTargetDir = oldHelpTarget;
+        });
+
 
         // Button(window, Rect(0, 0, w, h))
         // .states_([["browse class"]])
